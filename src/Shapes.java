@@ -17,6 +17,8 @@ public class Shapes extends JComponent  {
         int green = rainbow.nextInt(255);
        // int sideno = rainbow.nextInt(7)+3;
         g.setColor(new Color(red, blue, green));
+        repaint();
+        g.drawOval(10, 40, 50, 100);
 
         /*
         double theta = 2 * Math.PI/sideno;
@@ -32,15 +34,20 @@ public class Shapes extends JComponent  {
 
 
 class createShapes implements Runnable {
+    int x,y;
     ArrayList<Object> shapes = new ArrayList<>();
+    createShapes(int x, int y){
+       this.x = 10;
+       this.y = 10;
+    }
 
         public void run(){
-            int count = 1;
-            for (int i = 0; i < count; i++) {
-                shapes.add(new Polygon());
-                shapes.add(new Oval());
-                count = +count;
+            for (int i = 1; i < 99; i++) {
+                shapes.add(new PPolygon(x, y));
+                shapes.add(new POval());
+                //count +=count;
             }
+
 
 
         try {
@@ -50,36 +57,66 @@ class createShapes implements Runnable {
             e.printStackTrace();
 
         }
-    }}
+    }
+}
 
 
-abstract class holdShapes{
+
+
+class POval extends JComponent {
     protected int width;
     protected int height;
     protected int rad;
     protected Random rand = new Random();
-}
+    int x,y;
+    POval(int width, int rad) {
+        this.width = width;
+        this.rad = rad;
+        }
+        @Override
+        public void paint(Graphics g){
+        super.paintComponent(g);
+            Random rainbow = new Random();
+            int red = rainbow.nextInt(255);
+            int blue = rainbow.nextInt(255);
+            int green = rainbow.nextInt(255);
+            g.setColor(new Color(red, blue, green));
+        g.drawOval(x,y,width,height);
+        repaint();
+        }
+        public POval dimensions(int x, int r){
+        POval PO1 = new POval(x, r);
+        x = rand.nextInt();
+        r = width/2;
 
-class Oval extends holdShapes {
-    Oval() {
-        width = rand.nextInt(Shapes.MAX_WIDTH);
-        rad = width / 2;
+
         }
     }
-   class Polygon extends holdShapes{
+   class PPolygon extends JComponent{
        int nosides;
        int []polyx;
        int[] polyy;
-    Polygon(){
+
+       Random rand = new Random();
+    PPolygon(int x, int y){
         nosides = rand.nextInt(7)+ 3 ;
-        int count = nosides;
-        polyx = new int[count];
-        polyy = new int[count];
+        polyx = new int[nosides];
+        polyy = new int[nosides];
         for (int i = 0; i < nosides; i++){
-            polyx[i] = rand.nextInt(width);
-            polyy[i] = rand.nextInt(height);
-            count++;
+            polyx[i] = rand.nextInt(x);
+            polyy[i] = rand.nextInt(y);
         }
+    }
+    @Override
+       public void paint(Graphics g){
+        g.drawPolygon(polyx,polyy,nosides);
+        Random rainbow = new Random();
+        int red = rainbow.nextInt(255);
+        int blue = rainbow.nextInt(255);
+        int green = rainbow.nextInt(255);
+        // int sideno = rainbow.nextInt(7)+3;
+        g.setColor(new Color(red, blue, green));
+        repaint();
     }
 
         }
@@ -100,9 +137,13 @@ class Main {
         frame.add(panel);
         frame.setVisible(true);
         frame.setBackground(Color.black);
-        createShapes x1 = new createShapes();
+//        frame.getContentPane().add(new JFrame());
+        createShapes x1 = new createShapes(Shapes.MAX_WIDTH,Shapes.MAX_HEIGHT);
         Thread threader = new Thread(x1);
         threader.start();
-
+        threader.join();
+        for(Object x:x1.shapes){
+            System.out.println(x);
+        }
     }
 }
