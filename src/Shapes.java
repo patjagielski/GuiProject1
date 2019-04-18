@@ -4,21 +4,21 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Shapes extends JComponent  {
+ public abstract class Shapes extends JComponent  {
     static final int MAX_HEIGHT = 1000;
     static final int MAX_WIDTH = 1000;
 
-    public void paintComponent(Graphics g) {
+    public void paint(Graphics g) {
 
         //set random color
-        Random rainbow = new Random();
+        /*Random rainbow = new Random();
         int red = rainbow.nextInt(255);
         int blue = rainbow.nextInt(255);
         int green = rainbow.nextInt(255);
        // int sideno = rainbow.nextInt(7)+3;
         g.setColor(new Color(red, blue, green));
-        repaint();
-        g.drawOval(10, 40, 50, 100);
+        repaint();*/
+
 
         /*
         double theta = 2 * Math.PI/sideno;
@@ -29,22 +29,32 @@ public class Shapes extends JComponent  {
             arry[i] = getHeight()/2 + (int)(Math.sin(theta * i)*50);
             */
         }
+        public static Color Rainbow(){
+            Random rainbow = new Random();
+            int red = rainbow.nextInt(255);
+            int blue = rainbow.nextInt(255);
+            int green = rainbow.nextInt(255);
+            return new Color(red,green,blue);
+        }
         //g.drawPolygon(arrx,arry,sideno);
     }
 
 
 class createShapes implements Runnable {
-    int x,y;
+    int x1,y1;
     ArrayList<Object> shapes = new ArrayList<>();
     createShapes(int x, int y){
-       this.x = 10;
-       this.y = 10;
+       this.x1 = x;
+       this.y1 = x;
     }
 
         public void run(){
             for (int i = 1; i < 99; i++) {
+                int x= (int)(Math.random()*x1);
+                int y = (int)(Math.random()*y1);
+                System.out.println(x + " " + y);
                 shapes.add(new PPolygon(x, y));
-                shapes.add(new POval());
+                shapes.add(new POval(x,y));
                 //count +=count;
             }
 
@@ -63,39 +73,34 @@ class createShapes implements Runnable {
 
 
 
-class POval extends JComponent {
+class POval extends Shapes {
+
     protected int width;
     protected int height;
     protected int rad;
-    protected Random rand = new Random();
+
     int x,y;
-    POval(int width, int rad) {
-        this.width = width;
-        this.rad = rad;
+    Color g1 = Shapes.Rainbow();
+    POval(int x, int y) {
+        this.x=x;
+        this.y=y;
+        width=(int)(Math.random()*x);
+        height=(int)(Math.random()*y);
         }
         @Override
         public void paint(Graphics g){
         super.paintComponent(g);
-            Random rainbow = new Random();
-            int red = rainbow.nextInt(255);
-            int blue = rainbow.nextInt(255);
-            int green = rainbow.nextInt(255);
-            g.setColor(new Color(red, blue, green));
+        g.setColor(g1);
         g.drawOval(x,y,width,height);
-        repaint();
-        }
-        public POval dimensions(int x, int r){
-        POval PO1 = new POval(x, r);
-        x = rand.nextInt();
-        r = width/2;
-
 
         }
+
     }
-   class PPolygon extends JComponent{
+   class PPolygon extends Shapes{
        int nosides;
        int []polyx;
        int[] polyy;
+       Color g1 = Shapes.Rainbow();
 
        Random rand = new Random();
     PPolygon(int x, int y){
@@ -109,14 +114,12 @@ class POval extends JComponent {
     }
     @Override
        public void paint(Graphics g){
-        g.drawPolygon(polyx,polyy,nosides);
-        Random rainbow = new Random();
-        int red = rainbow.nextInt(255);
-        int blue = rainbow.nextInt(255);
-        int green = rainbow.nextInt(255);
+        super.paintComponent(g);
+
         // int sideno = rainbow.nextInt(7)+3;
-        g.setColor(new Color(red, blue, green));
-        repaint();
+        g.setColor(g1);
+        g.drawPolygon(polyx,polyy,nosides);
+
     }
 
         }
@@ -131,10 +134,10 @@ class Main {
         //String y = scan.nextLine();
         //String z = scan.nextLine();
         JFrame frame = new JFrame();
-        Shapes panel = new Shapes();
+
         frame.setSize(Shapes.MAX_WIDTH, Shapes.MAX_HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
+
         frame.setVisible(true);
         frame.setBackground(Color.black);
 //        frame.getContentPane().add(new JFrame());
@@ -142,8 +145,11 @@ class Main {
         Thread threader = new Thread(x1);
         threader.start();
         threader.join();
-        for(Object x:x1.shapes){
-            System.out.println(x);
+        for(Object x : x1.shapes){
+            frame.add(((Shapes)x));
+            frame.setVisible(true);
+            Thread.sleep(200);
         }
+
     }
 }
