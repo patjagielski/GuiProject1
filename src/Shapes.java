@@ -1,7 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -44,8 +46,8 @@ class createShapes implements Runnable {
 
     public void run() {
         for (int i = 1; i < 99; i++) {
-            int x = (int) (Math.random() * width);
-            int y = (int) (Math.random() * height);
+            int x = Math.abs((int) (Math.random() * width))+1;
+            int y = Math.abs((int) (Math.random() * height))+1;
             System.out.println(x + " | " + y);
             shapes.add(new PPolygon(x, y));
             shapes.add(new POval(x, y));
@@ -147,7 +149,7 @@ class createShapes implements Runnable {
             super.paint(g);
             g.setColor(g1);
             g.drawOval(x, y, width, rad);
-            repaint();
+
         }
 
 
@@ -230,6 +232,7 @@ class createShapes implements Runnable {
     class Main {
         public static void main(String[] args) throws InterruptedException   {
             boolean endprogram = false;
+            ArrayList<Shapes> fileread = new ArrayList<>();
             Scanner scan = new Scanner(System.in);
             System.out.println("START - run the program");
             System.out.println("STOP - save the shapes to a file");
@@ -248,12 +251,12 @@ class createShapes implements Runnable {
             threader.start();
             threader.join();
             try{
-            BufferedWriter writer = new BufferedWriter(new FileWriter("Example.txt"));
+            BufferedWriter writer = new BufferedWriter(new FileWriter("Example1.txt"));
 
             for (Object x : x1.shapes) {
                 frame.add((Shapes) (x));
                 frame.setVisible(true);
-                System.out.println(x.toString());
+
                 writer.write(x.toString() +"\n");
 
             }
@@ -261,9 +264,71 @@ class createShapes implements Runnable {
             catch(IOException e){
                 System.out.print(e.getStackTrace());
             }
+            try {
+                File file = new File("Example1.txt");
 
+
+                BufferedReader in
+                        = new BufferedReader(new FileReader(file));
+
+                String st;
+                while ((st = in.readLine()) != null) {
+                    String[] output;
+                    output = st.split("\\s");
+                    fileread.add(creationfile(output));
+                }
+                in.close();
+            }
+        catch(IOException e){
+                System.out.println(e.getClass().getSimpleName());
+
+            }
+
+            JFrame frame1 = new JFrame();
+            frame1.setSize(Shapes.MAX_WIDTH, Shapes.MAX_HEIGHT);
+            frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame1.setVisible(true);
+            frame1.setResizable(true);
+            frame1.setBackground(Color.black);
+
+           for(Object x2 : fileread){
+               frame1.add((Shapes)x2);
+               frame1.setVisible(true);
+           }
         }
 
+    public static Shapes creationfile(String[] s){
+            if(s[0].equalsIgnoreCase("Oval")){
+                POval output = new POval(Integer.parseInt(s[4]),Integer.parseInt(s[4]));
+                output.rad=Integer.parseInt(s[7]);
+                output.width=Integer.parseInt(s[6]);
+                output.g1=new Color(Integer.parseInt(s[1]),Integer.parseInt(s[2]),Integer.parseInt(s[3]));
 
+                return output;
+            }
+            else{
+                PPolygon output = new PPolygon(1,1);
+                output.g1=new Color(Integer.parseInt(s[1]),Integer.parseInt(s[2]),Integer.parseInt(s[3]));
+                int size = (s.length-4)/2;
+
+                int polyx[] = new int[size];
+                int poly[] = new int[size];
+                int countx=0;
+                int county=0;
+                for(int i =4;i<s.length;i++){
+                    if(i%2==0){
+                        polyx[countx++]=Integer.parseInt(s[i]);
+                    }else{
+                        poly[county++]=Integer.parseInt(s[i]);
+                    }
+                }
+                output.polyy=poly;
+                output.polyx=polyx;
+                output.nosides=size;
+                return output;
+
+            }
+
+    }
     }
 
