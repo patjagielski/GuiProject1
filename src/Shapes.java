@@ -135,32 +135,11 @@ class createShapes implements Runnable {
         public String objType(){
             return objectType;
         }
-        public Color getRGB(){
-            return POval.rainbow();
-        }
-        public ArrayList getDimensions(){
-            int count = 0;
-            ArrayList<Integer> dimO = new ArrayList<>();
-            for(int i = 0; i<4; i++){
-                if(count == 0) {
-                  dimO.add(x);
-                    count++;
-                }else if(count == 1){
-                    dimO.add(y);
-                    count++;
-                }else if(count == 2){
-                    dimO.add(width);
-                    count++;
-                }
-                else{
-                    dimO.add(rad);
-                }
-            }
-            return dimO;
-        }
+
+
         @Override
         public String toString(){
-            return  "|" +objType() + " " + getRGB() + " " + getDimensions() + " |";
+            return  objType() + " " + g1.getRed()+" "+g1.getGreen()+" "+g1.getBlue() + " " + x+" "+y+" "+width+" "+ rad ;
         }
 
         @Override
@@ -185,8 +164,8 @@ class createShapes implements Runnable {
             polyx = new int[nosides];
             polyy = new int[nosides];
             for (int i = 0; i < nosides; i++) {
-                polyx[i] = rand.nextInt(x);
-                polyy[i] = rand.nextInt(y);
+                polyx[i] = Math.abs(rand.nextInt(x));
+                polyy[i] =  Math.abs(rand.nextInt(y));
             }
         }
         /*
@@ -208,25 +187,31 @@ class createShapes implements Runnable {
         public Color ShapeRGB(){
            return PPolygon.rainbow();
         }
-        public ArrayList<Integer> getDimensions(){
-            int count = 0;
+        public String getDimensions(){
+            int countx = 0;
+            int county=0;
             int it = 0;
             ArrayList<Integer> dim = new ArrayList<>();
-            for(int i = 0; i<it; i++){
-                if(count == 0) {
-                    dim.add(polyx[it]);
-                   count++;
-                }else{
-                    dim.add(polyy[it]);
-                    count--;
-                    it++;
+            int size=polyx.length+polyy.length;
+            for(int i=0;i<size;i++){
+                if(i%2==0){
+                    dim.add(polyx[countx++]);
+                }
+                else{
+                    dim.add(polyy[county++]);
                 }
             }
-            return dim;
-        }
+            String result="";
+            for(int p : dim){
+                result=result+String.valueOf(p)+" ";
+            }
+            return result;
+            }
+
+
         @Override
         public String toString(){
-            return "/" + ObjName() + " " + ShapeRGB() + " " + getDimensions() + "/";
+            return  ObjName() + " " + g1.getRed()+" "+g1.getGreen()+" "+g1.getBlue() + " " + getDimensions() ;
         }
 
 
@@ -262,11 +247,19 @@ class createShapes implements Runnable {
             Thread threader = new Thread(x1);
             threader.start();
             threader.join();
+            try{
+            BufferedWriter writer = new BufferedWriter(new FileWriter("Example.txt"));
+
             for (Object x : x1.shapes) {
                 frame.add((Shapes) (x));
                 frame.setVisible(true);
-                System.out.println(x);
-                Thread.sleep(600);
+                System.out.println(x.toString());
+                writer.write(x.toString() +"\n");
+
+            }
+                writer.close();}
+            catch(IOException e){
+                System.out.print(e.getStackTrace());
             }
 
         }
